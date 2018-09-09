@@ -1,0 +1,44 @@
+rankhospital <- function(state, outcome, num = "best") {
+
+	## Read outcome data
+		
+		data <- read.csv("outcome-of-care-measures.csv", colClasses = "character")	
+		newdata <- data[ ,c(2, 7, 11, 17, 23)]
+		names(newdata) <- c("Hospital_Name", "state", "heart attack", "heart failure", "pneumonia")
+		outcomes <- c("heart attack", "heart failure", "pneumonia")
+ 
+	## Check that state and outcome are valid
+
+	   	if(is.element(toupper(state), newdata$state) == FALSE) { stop("invalid state") }
+	   	if(is.element(tolower(outcome), outcomes) == FALSE) { stop("invalid outcome") } 
+	
+	## Return hospital name in that state with the given rank
+		
+		state_data <- newdata[newdata$state == state & newdata[outcome] != 'Not Available', ]
+		state_data[ ,outcome] = as.numeric(state_data[ ,outcome])
+		state_data <- state_data[order (state_data[, "Hospital_Name"]), ]
+		state_data <- state_data[order(state_data[, outcome]), ]
+	
+	## Arranging the values 
+		
+		max <- nrow(state_data)
+		if(num == "best" | num == "BEST")
+		{
+		 num <- 1
+		}
+		else if(num == "worst" | num == "WORST")
+		{
+		 num <- max
+		} 
+		else if(num > max)
+		{
+		 output <- NA
+		}
+		else{ output <- "invalid ouput" }
+				
+		output <- state_data[num, "Hospital_Name"]
+		
+		## 30-day death rate
+			return(output)
+		
+		}
